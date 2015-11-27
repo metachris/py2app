@@ -49,7 +49,13 @@ def retry_import(mf, m):
     else:
         m.__class__ = CompiledModule
 
-    m = mf.load_module(m.identifier, fp, pathname, stuff)
+    # Recent versions of modulegraph made scan_code private,
+    # temporarily call the private version.
+    if hasattr(mf, "load_module"):
+        m = mf.load_module(m.identifier, fp, pathname, stuff)
+    else:
+        m = mf._load_module(m.identifier, fp, pathname, stuff)
+
     if parent:
         mf.createReference(m, parent)
         parent[partname] = m
